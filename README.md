@@ -1,6 +1,6 @@
 # scRNA-seq Analysis Pipeline Dnmt3aKO (GSE168807) - Platform: 10x Genomics
 
-This repository contains a complete pipeline for analyzing single-cell RNA-seq data.
+This repository contains a complete pipeline for analyzing single-cell RNA-seq data and single-cell Transposable Element data.
 
 Data downloaded from GSE168807 - PMID: 35394496
 
@@ -34,9 +34,7 @@ All data and repositories are stored in "Z:\home\common\Data\NM\Dnmt3aKO_GSE1688
   *(Not included in this repository due to dataset size and restrictions)*
 - `csv/` – CSV files generated during analysis
 - `gencode/` – files related to GENCODE annotation
-  *(Not included in this repository due to file size)*
 - `hscscore/` – files and outputs from HSC score analysis
-  *(Not included in this repository due to file size)*
 - `plots/` – figures and plots generated during the analysis  
 - `rda/` – saved `.rda` objects  
   *(Not included in this repository due to file size)*
