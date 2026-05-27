@@ -11,7 +11,7 @@
 
 <meta name="author" content="Natalia Silva Morosini" />
 
-<meta name="date" content="2026-05-21" />
+<meta name="date" content="2026-05-27" />
 
 <title>Dnmt3aKO_GSE168807</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Dnmt3aKO_GSE168807</h1>
 <h3 class="subtitle">Dataset - 10xGenomics</h3>
 <h4 class="author">Natalia Silva Morosini</h4>
-<h4 class="date">May 21, 2026</h4>
+<h4 class="date">May 27, 2026</h4>
 
 </div>
 
@@ -4542,7 +4542,7 @@ combined &lt;- normalizeSparseEset(combined, scale_factor = 1000000, log_base = 
 <div id="generating-mica-input" class="section level2" number="18.3">
 <h2><span class="header-section-number">18.3</span> Generating MICA
 input</h2>
-<pre class="r"><code>load(&quot;Z:/home/common/Data/NM/Dnmt3aKO_GSE168807/scMINER/eset_combined_normalized.rda&quot;)
+<pre class="r"><code>load(&quot;scMINER/eset_combined_normalized.rda&quot;)
 
 generateMICAinput(input_eset = combined, output_file = &quot;scMINER/mica.txt&quot;, overwrite = TRUE)
 
