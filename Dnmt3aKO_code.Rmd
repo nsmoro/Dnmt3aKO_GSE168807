@@ -4102,7 +4102,7 @@ combined <- normalizeSparseEset(combined, scale_factor = 1000000, log_base = 2, 
 ## Generating MICA input
 
 ```{r mica-input, warning=FALSE, eval=FALSE,eval=FALSE}
-load("Z:/home/common/Data/NM/Dnmt3aKO_GSE168807/scMINER/eset_combined_normalized.rda")
+load("scMINER/eset_combined_normalized.rda")
 
 generateMICAinput(input_eset = combined, output_file = "scMINER/mica.txt", overwrite = TRUE)
 
