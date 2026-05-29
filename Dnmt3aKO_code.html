@@ -11,7 +11,7 @@
 
 <meta name="author" content="Natalia Silva Morosini" />
 
-<meta name="date" content="2026-05-27" />
+<meta name="date" content="2026-05-21" />
 
 <title>Dnmt3aKO_GSE168807</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Dnmt3aKO_GSE168807</h1>
 <h3 class="subtitle">Dataset - 10xGenomics</h3>
 <h4 class="author">Natalia Silva Morosini</h4>
-<h4 class="date">May 27, 2026</h4>
+<h4 class="date">May 21, 2026</h4>
 
 </div>
 
@@ -4590,7 +4590,11 @@ gc()</code></pre>
 Inference</h2>
 <p>This second part was performed on an HPC using python=3.9.2 following
 the steps described here: <a href="https://github.com/jyyulab/scMINER" class="uri">https://github.com/jyyulab/scMINER</a></p>
+<p>I removed HSC_High, HSC_Medium and HSC_Low from the analysis as these
+scores were used only to help identifying LT_HSC (our goal).</p>
 <pre class="r"><code>load(&quot;rda/eset_combined.rda&quot;)
+
+phenoData(combined)$HSCscore &lt;- gsub(&quot;-&quot;, &quot;_&quot;, phenoData(combined)$HSCscore)
 
 # 1) Generating Input
 generateSJARACNeInput(input_eset = combined, group_name = &quot;HSCscore&quot;, 
@@ -4674,12 +4678,15 @@ subset_eset_genes &lt;- function(obj, genes_keep) {
 ## Find a consensus network file in a directory, robust to small naming diffs
 find_network_file &lt;- function(dir_path) {
   if (!dir.exists(dir_path)) return(NA_character_)
-  candidates &lt;- list.files(dir_path, pattern = &quot;^consensus_network_ncol.*\\.txt$&quot;, full.names = TRUE)
+  candidates &lt;- list.files(dir_path, pattern = &quot;^consensus_network_ncol.*\\.txt$&quot;,
+                           full.names = TRUE, recursive = TRUE)
   if (length(candidates) == 0) {
-    candidates &lt;- list.files(dir_path, pattern = &quot;ncol.*\\.txt$&quot;, full.names = TRUE)
+    candidates &lt;- list.files(dir_path, pattern = &quot;ncol.*\\.txt$&quot;,
+                             full.names = TRUE, recursive = TRUE)
   }
   if (length(candidates) == 0) return(NA_character_)
-  exact &lt;- candidates[basename(candidates) == &quot;consensus_network_ncol.txt&quot;]
+  # Prefer the bare consensus file over any NetworkQC HTML-adjacent copy
+  exact &lt;- candidates[basename(candidates) == &quot;consensus_network_ncol_.txt&quot;]
   if (length(exact) &gt;= 1) return(exact[1])
   candidates[1]
 }
@@ -4691,6 +4698,10 @@ read_network_genes &lt;- function(path) {
   if (is.null(df) || ncol(df) &lt; 2) return(character())
   unique(c(df[[1]], df[[2]]))
 }
+
+phenoData(eset)$HSCscore &lt;- gsub(&quot;-&quot;, &quot;_&quot;, phenoData(eset)$HSCscore)
+
+subtypes &lt;- c(&quot;CMP&quot;,&quot;GMP&quot;,&quot;LMPP&quot;,&quot;LT_HSC&quot;,&quot;MEP&quot;,&quot;MPP1&quot;,&quot;MPP2&quot;,&quot;MPP3&quot;,&quot;ST_HSC&quot;)
 
 ## Determine annotation column automatically ---
 meta &lt;- get_meta(combined)
@@ -4797,7 +4808,6 @@ combined_activity &lt;- do.call(
 )
 
 ## Heatmap combined
-combined_activity &lt;- do.call(cbind, lapply(activity_list, Biobase::exprs))
 group_labels &lt;- rep(names(activity_list), times = sapply(activity_list, function(x) ncol(Biobase::exprs(x))))
 
 # Optional: filter top TFs across all
@@ -4869,7 +4879,7 @@ ha &lt;- HeatmapAnnotation(
   show_annotation_name = FALSE
 )
 
-test &lt;- Heatmap(
+ht_tf &lt;- Heatmap(
   mat_TF,
   name = &quot;z-score&quot;,
   top_annotation = ha,
@@ -4882,7 +4892,7 @@ test &lt;- Heatmap(
 
 png(&quot;plots/scMINER_TF.png&quot;,width = 18, height = 20, units = &quot;in&quot;, res = 300)
 grid.newpage()
-ComplexHeatmap::draw(test, newpage = FALSE)
+ComplexHeatmap::draw(ht_tf, newpage = FALSE)
 dev.off()
 
 # Heatmap SIG 
@@ -4908,7 +4918,7 @@ ha &lt;- HeatmapAnnotation(
   show_annotation_name = FALSE
 )
 
-test2 &lt;- Heatmap(
+ht_sig &lt;- Heatmap(
   mat_SIG,
   name = &quot;z-score&quot;,
   top_annotation = ha,
@@ -4921,7 +4931,7 @@ test2 &lt;- Heatmap(
 
 png(&quot;plots/scMINER_SIG.png&quot;,width = 18, height = 20, units = &quot;in&quot;, res = 300)
 grid.newpage()
-ComplexHeatmap::draw(test2, newpage = FALSE)
+ComplexHeatmap::draw(ht_sig, newpage = FALSE)
 dev.off()</code></pre>
 </div>
 <div id="part-20---session-information" class="section level1" number="20">
@@ -4953,7 +4963,7 @@ Session Information</strong></h1>
 ##  [5] cachem_1.1.0      knitr_1.51        htmltools_0.5.9   rmarkdown_2.31   
 ##  [9] lifecycle_1.0.5   cli_3.6.5         sass_0.4.10       jquerylib_0.1.4  
 ## [13] compiler_4.4.1    rstudioapi_0.18.0 tools_4.4.1       evaluate_1.0.5   
-## [17] bslib_0.10.0      yaml_2.3.12       otel_0.2.0        jsonlite_2.0.0   
+## [17] bslib_0.11.0      yaml_2.3.12       otel_0.2.0        jsonlite_2.0.0   
 ## [21] rlang_1.1.7</code></pre>
 <pre class="r"><code>R.version</code></pre>
 <pre><code>##                _                                
