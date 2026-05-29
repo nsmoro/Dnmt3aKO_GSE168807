@@ -2,7 +2,7 @@
 title: "Dnmt3aKO_GSE168807"
 subtitle: "Dataset - 10xGenomics"
 author: "Natalia Silva Morosini"
-date: "`r format(Sys.Date(), '%B %d, %Y')`"
+date: "May 21, 2026"
 output:
   html_document:
     toc: true
@@ -4151,8 +4151,12 @@ gc()
 
 This second part was performed on an HPC using python=3.9.2 following the steps described here: https://github.com/jyyulab/scMINER
 
+I removed HSC_High, HSC_Medium and HSC_Low from the analysis as these scores were used only to help identifying LT_HSC (our goal).
+
 ```{r sjaracne, warning=FALSE, eval=FALSE}
 load("rda/eset_combined.rda")
+
+phenoData(combined)$HSCscore <- gsub("-", "_", phenoData(combined)$HSCscore)
 
 # 1) Generating Input
 generateSJARACNeInput(input_eset = combined, group_name = "HSCscore", 
@@ -4236,12 +4240,15 @@ subset_eset_genes <- function(obj, genes_keep) {
 ## Find a consensus network file in a directory, robust to small naming diffs
 find_network_file <- function(dir_path) {
   if (!dir.exists(dir_path)) return(NA_character_)
-  candidates <- list.files(dir_path, pattern = "^consensus_network_ncol.*\\.txt$", full.names = TRUE)
+  candidates <- list.files(dir_path, pattern = "^consensus_network_ncol.*\\.txt$",
+                           full.names = TRUE, recursive = TRUE)
   if (length(candidates) == 0) {
-    candidates <- list.files(dir_path, pattern = "ncol.*\\.txt$", full.names = TRUE)
+    candidates <- list.files(dir_path, pattern = "ncol.*\\.txt$",
+                             full.names = TRUE, recursive = TRUE)
   }
   if (length(candidates) == 0) return(NA_character_)
-  exact <- candidates[basename(candidates) == "consensus_network_ncol.txt"]
+  # Prefer the bare consensus file over any NetworkQC HTML-adjacent copy
+  exact <- candidates[basename(candidates) == "consensus_network_ncol_.txt"]
   if (length(exact) >= 1) return(exact[1])
   candidates[1]
 }
@@ -4253,6 +4260,10 @@ read_network_genes <- function(path) {
   if (is.null(df) || ncol(df) < 2) return(character())
   unique(c(df[[1]], df[[2]]))
 }
+
+phenoData(eset)$HSCscore <- gsub("-", "_", phenoData(eset)$HSCscore)
+
+subtypes <- c("CMP","GMP","LMPP","LT_HSC","MEP","MPP1","MPP2","MPP3","ST_HSC")
 
 ## Determine annotation column automatically ---
 meta <- get_meta(combined)
@@ -4359,7 +4370,6 @@ combined_activity <- do.call(
 )
 
 ## Heatmap combined
-combined_activity <- do.call(cbind, lapply(activity_list, Biobase::exprs))
 group_labels <- rep(names(activity_list), times = sapply(activity_list, function(x) ncol(Biobase::exprs(x))))
 
 # Optional: filter top TFs across all
@@ -4431,7 +4441,7 @@ ha <- HeatmapAnnotation(
   show_annotation_name = FALSE
 )
 
-test <- Heatmap(
+ht_tf <- Heatmap(
   mat_TF,
   name = "z-score",
   top_annotation = ha,
@@ -4444,7 +4454,7 @@ test <- Heatmap(
 
 png("plots/scMINER_TF.png",width = 18, height = 20, units = "in", res = 300)
 grid.newpage()
-ComplexHeatmap::draw(test, newpage = FALSE)
+ComplexHeatmap::draw(ht_tf, newpage = FALSE)
 dev.off()
 
 # Heatmap SIG 
@@ -4470,7 +4480,7 @@ ha <- HeatmapAnnotation(
   show_annotation_name = FALSE
 )
 
-test2 <- Heatmap(
+ht_sig <- Heatmap(
   mat_SIG,
   name = "z-score",
   top_annotation = ha,
@@ -4483,7 +4493,7 @@ test2 <- Heatmap(
 
 png("plots/scMINER_SIG.png",width = 18, height = 20, units = "in", res = 300)
 grid.newpage()
-ComplexHeatmap::draw(test2, newpage = FALSE)
+ComplexHeatmap::draw(ht_sig, newpage = FALSE)
 dev.off()
 ```
 
