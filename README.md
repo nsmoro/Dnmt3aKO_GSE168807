@@ -33,6 +33,7 @@ All data and repositories are stored in "Z:\home\common\Data\NM\Dnmt3aKO_GSE1688
 - `counts/` – input data objects
   *(Not included in this repository due to dataset size and restrictions)*
 - `csv/` – CSV files generated during analysis
+  *(Not included in this repository due to dataset size and restrictions)*
 - `gencode/` – files related to GENCODE annotation
 - `hscscore/` – files and outputs from HSC score analysis
 - `plots/` – figures and plots generated during the analysis  
