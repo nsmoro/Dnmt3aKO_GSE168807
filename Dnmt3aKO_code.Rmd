@@ -2,7 +2,7 @@
 title: "Dnmt3aKO_GSE168807"
 subtitle: "Dataset - 10xGenomics"
 author: "Natalia Silva Morosini"
-date: "May 21, 2026"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
   html_document:
     toc: true
